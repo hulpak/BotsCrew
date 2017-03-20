@@ -41,7 +41,7 @@ public class Book implements Comparable<Book>{
 
     @Override
     public String toString() {
-        return   name +" " + author ;
+        return   name +" - \""+ author+"\"";
     }
 
     public int compareTo(Book b) {

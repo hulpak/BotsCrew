@@ -41,7 +41,7 @@ public class DataBase {
             int p = b.getId();
             if(res.equals(name)) {
                 count++;
-                pos.put(p+1,new Book(b.getName(),b.getAuthor()));
+                pos.put(p,new Book(b.getName(),b.getAuthor()));
             }
         }
         return count;
@@ -133,6 +133,7 @@ public class DataBase {
     }
 
     public void addToList() {
+        book.clear();
         String query = "select * from book";
         try {
             rs = stmt.executeQuery(query);
