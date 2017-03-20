@@ -95,19 +95,48 @@ public class DataBase {
             }
     }
 
-    public void Update(String name,String newName) {
-        String sql = "UPDATE book SET  Name='"+newName+"' WHERE Name='"+name+"'";
+    public void UpdateById(int id,String newName) {
+        String sql = "UPDATE book SET  Name='" + newName + "' WHERE id="+id+"";
         try {
             ps = con.prepareStatement(sql);
             ps.executeUpdate();
-            System.out.println("Book " + name + " was updated  on "+newName);
+            System.out.println("Book was update");
         } catch (SQLException e) {
             e.printStackTrace();
-        } finally {
+        }finally {
             try {
                 ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    public void Update(String name,String newName) {
+        String sql = "UPDATE book SET  Name='" + newName + "' WHERE Name='" + name + "'";
+        int count = CountElem(name);
+        if (count > 1) {
+            System.out.println("Exists a few authors from this name " + name);
+            for (Map.Entry<Integer, Book> i : pos.entrySet()) {
+                System.out.println(i.getKey() + "." + i.getValue());
+            }
+            System.out.println(" Choose only one. Write number:  ");
+            Scanner sc = new Scanner(System.in);
+            int id = sc.nextInt();
+            UpdateById(id,newName);
+        } else {
+            try {
+                ps = con.prepareStatement(sql);
+                ps.executeUpdate();
+                System.out.println("Book " + name + " was updated  on " + newName);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
