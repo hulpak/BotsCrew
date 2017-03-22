@@ -1,8 +1,9 @@
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "book")
-public class Book implements  Comparable<Book>{
+public class Book implements  Comparable<Book>,Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
