@@ -1,6 +1,7 @@
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.annotations.SourceType;
 
 
 import java.util.*;
@@ -13,35 +14,14 @@ public class Database {
     Book book = new Book();
     List<Book> list = new ArrayList<Book>();
 
-    public void List() {
-        query = session.createQuery("From Book");
-        books = query.list();
-        Collections.sort(books);
-        for (Book b : books) {
-            System.out.println(b);
-        }
-    }
-    public void Add(Book bk){
-        sessionFactory = Hibernate.getSessionfactory();
-        session = sessionFactory.openSession();
-        try {
-            session.beginTransaction();
-            session.save(bk);
-            System.out.println(bk.getName()+" "+bk.getAuthor()+" was added");
-            session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-            e.printStackTrace();
-        }
-    }
+
     public void Delete(int id){
         sessionFactory = Hibernate.getSessionfactory();
         session = sessionFactory.openSession();
         try {
             session.beginTransaction();
-            Book b = (Book)session.get(Book.class, id);
-            session.delete(b);
-        System.out.println(b.getName()+" "+b.getAuthor()+" was deleted");
+            Query q=   session.createQuery("delete From Book where id=:id").setParameter("id",id);
+            q.executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
@@ -53,9 +33,8 @@ public class Database {
         session = sessionFactory.openSession();
         try {
             session.beginTransaction();
-        Book b = (Book)session.createQuery("from Book where name='"+name+"'");
-        session.delete(b);
-        System.out.println(b.getName()+" "+b.getAuthor()+" was deleted");
+            Query q = session.createQuery("delete From Book where name=:name").setParameter("name",name);
+           q.executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
@@ -67,31 +46,33 @@ public class Database {
         session = sessionFactory.openSession();
         try {
             session.beginTransaction();
-            Book b = (Book)session.get(Book.class, id);
-            b.setName(name);
-            System.out.println(b.getName()+" "+b.getAuthor()+" was updated on "+name+" "+b.getAuthor());
-            session.update(b);
+            Query q=  session.createQuery("update Book set name=:name where id=:id");
+            q.setParameter("name",name);
+            q.setParameter("id",id);
+            q.executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
             e.printStackTrace();
-        }
+
+    }
     }
     public void Update(String oldName, String newName){
         sessionFactory = Hibernate.getSessionfactory();
         session = sessionFactory.openSession();
         try {
             session.beginTransaction();
-            Book b = (Book)session.createQuery("from Book where name='"+oldName+"'");
-            b.setName(newName);
-            System.out.println(b.getName()+" "+b.getAuthor()+" was updated on "+newName+" "+b.getAuthor());
-            session.update(b);
+           Query q=  session.createQuery("update Book set name=:newName where name=:oldName");
+            q.setParameter("oldName",oldName);
+            q.setParameter("newName",newName);
+            q.executeUpdate();
             session.getTransaction().commit();
         } catch (Exception e) {
             session.getTransaction().rollback();
             e.printStackTrace();
         }
     }
+
     public int FewBooks(String name){
         int count = 0;
         list.clear();
@@ -120,15 +101,10 @@ public class Database {
 
             ConsoleWrite();
 
-            session.close();
-            sessionFactory.close();
             session.getTransaction().commit();
-        } catch (Exception e) {
-            session.getTransaction().rollback();
-            e.printStackTrace();
-        } finally {
             session.close();
             sessionFactory.close();
+        } catch (Exception e) {
         }
     }
     public List<Book> getBooks() {
@@ -153,8 +129,8 @@ public class Database {
                }
                case 2:{
                    System.out.println(" Write name the book which do you want to delete:");
-                   book.setName(StrLen());
-                   int count = FewBooks(book.getName());
+                   String name = StrLen();
+                   int count = FewBooks(name);
                    if(count>1) {
                        Print();
                        System.out.println(" Write number name the book which do you want to delete:");
@@ -164,26 +140,27 @@ public class Database {
                    }
                    else
                    {
-                       Delete(book.getName());
+                       Delete(name);
                        break;
                    }
 
                }
                case 3:{
                    System.out.println(" Write name the book which do you want to update:");
-                   book.setName(StrLen());
+                   String old = StrLen();
                    System.out.println(" Write new name the book which do you want to update:");
                    String newName = StrLen();
-                   int count = FewBooks(book.getName());
+                   int count = FewBooks(old);
                    if(count>1) {
                        Print();
                        System.out.println(" Write number name the book which do you want to update:");
-                       book.setId(ScannerNumber());
-                       Update(book.getId(),newName);
+                       int id = ScannerNumber();
+                       Update(id,newName);
+                       break;
                    }
                    else
                    {
-                       Update(book.getName(),newName);
+                       Update(old,newName);
                        break;
                    }
                }
@@ -212,6 +189,29 @@ public class Database {
        Scanner sc = new Scanner(System.in);
        String str = sc.nextLine();
        return str;
+    }
+    public void List() {
+        query = session.createQuery("From Book");
+        books = query.list();
+        Collections.sort(books);
+        for (Book b : books) {
+            System.out.println(b);
+        }
+        System.out.println();
+    }
+    public void Add(Book bk){
+        sessionFactory = Hibernate.getSessionfactory();
+        session = sessionFactory.openSession();
+        try {
+            session.beginTransaction();
+            session.save(bk);
+            System.out.println(bk.getName()+" "+bk.getAuthor()+" was added");
+            System.out.println();
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            e.printStackTrace();
+        }
     }
 }
 
